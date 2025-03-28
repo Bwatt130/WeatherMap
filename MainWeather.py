@@ -10,7 +10,7 @@ async def getweather() -> None:
     
         # returns the current day's forecast temperature (int)
         print(weather.temperature)
-        
+        #this is a change
         # get the weather forecast for a few days
         for daily in weather:
             print(daily)
