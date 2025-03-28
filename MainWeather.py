@@ -28,9 +28,8 @@ def show_map_popup():
     map_filepath = "map.html"
     my_map.save(map_filepath)
 
-    # Open the HTML file in a web browser using a popup window
-    w = webbrowser.get()
-    w.open(f"file://{map_filepath}", new=2)
+    # Open the HTML file in the user's default web browser using a popup window
+    webbrowser.open(f"file://{map_filepath}", new=2)
 
 asyncio.run(getweather())
 m = folium.Map(location=(45.5236, -122.6750))
