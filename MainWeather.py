@@ -20,9 +20,9 @@ async def getweather() -> None:
         # hourly forecasts
         for hourly in daily:
             print(f' --> {hourly!r}')
-def show_map_popup():
+def show_map_popup(lat, long):
     # Create a map object centered at a specific location
-    my_map = folium.Map(location=[40.7128, -74.0060], zoom_start=10)  # Example: New York City
+    my_map = folium.Map(location=[lat, long], zoom_start=10)  # Example: New York City
 
     df = pd.DataFrame(
     data=[["apple", "oranges"], ["other", "stuff"]], columns=["cats", "dogs"]
@@ -37,7 +37,7 @@ def show_map_popup():
     iframe = branca.element.IFrame(html=html, width=500, height=300)
     popup = folium.Popup(iframe, max_width=500)
 
-    folium.Marker([40.7128, -74.0060], popup=popup).add_to(my_map)
+    folium.Marker([lat, long], popup=popup).add_to(my_map)
 
     # Save the map as an HTML file
     map_filepath = "C:\Windows\Temp\map.html"
@@ -47,4 +47,4 @@ def show_map_popup():
     webbrowser.open(f"file:/{map_filepath}", new=2)
 
 asyncio.run(getweather())
-show_map_popup()
+show_map_popup(40.7128, -74.0060)
