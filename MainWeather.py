@@ -1,3 +1,6 @@
+import tkinter as tk
+from tkinterweb import HtmlFrame
+import tempfile
 import python_weather
 import pandas as pd
 import folium
@@ -47,4 +50,27 @@ def show_map_popup(lat, long):
     webbrowser.open(f"file:/{map_filepath}", new=2)
 
 asyncio.run(getweather())
-show_map_popup(40.7128, -74.0060)
+m = folium.Map(location=(45.5236, -122.6750))
+#show_map_popup(40.7128, -74.0060)
+
+temp_dir = tempfile.gettempdir()
+html_file_path = os.path.join(temp_dir, "map.html")
+
+main = tk.Tk()
+main.config(bg="#E4E2E2")
+main.title("Main Window")
+main.geometry("700x400")
+
+label = tk.Label(master=main, text="Text Box")
+label.config(bg="#E4E2E2", fg="#000")
+label.place(x=57, y=76, width=80, height=40)
+
+text = tk.Text(master=main)
+text.config(bg="#fff", fg="#000")
+text.place(x=60, y=154, width=120, height=80)
+
+frame = HtmlFrame(main)
+frame.load_website(html_file_path)
+frame.pack(fill="both", expand=True)
+
+main.mainloop()
