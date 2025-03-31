@@ -1,5 +1,7 @@
 import python_weather
+import pandas as pd
 import folium
+import branca
 import webbrowser
 import asyncio
 import os
@@ -22,6 +24,21 @@ def show_map_popup():
     # Create a map object centered at a specific location
     my_map = folium.Map(location=[40.7128, -74.0060], zoom_start=10)  # Example: New York City
 
+    df = pd.DataFrame(
+    data=[["apple", "oranges"], ["other", "stuff"]], columns=["cats", "dogs"]
+    )
+
+    html = df.to_html(
+        classes="table table-striped table-hover table-condensed table-responsive"
+    )
+
+    popup = folium.Popup(html)
+
+    iframe = branca.element.IFrame(html=html, width=500, height=300)
+    popup = folium.Popup(iframe, max_width=500)
+
+    folium.Marker([40.7128, -74.0060], popup=popup).add_to(my_map)
+
     # Save the map as an HTML file
     map_filepath = "C:\Windows\Temp\map.html"
     my_map.save(map_filepath)
@@ -30,5 +47,4 @@ def show_map_popup():
     webbrowser.open(f"file:/{map_filepath}", new=2)
 
 asyncio.run(getweather())
-m = folium.Map(location=(45.5236, -122.6750))
 show_map_popup()
