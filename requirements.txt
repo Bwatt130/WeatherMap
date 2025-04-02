@@ -1,0 +1,5 @@
+tkinterweb
+python-weather
+pandas
+folium
+branca
