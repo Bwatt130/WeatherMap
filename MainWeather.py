@@ -111,7 +111,22 @@ def search_button_pressed(city):
     if city.strip() == "":
         messagebox.showerror("Error", "Please enter a city name.")
     else:
-        asyncio.run(main(city, 39.9526, -75.1652))
+        try:
+            df = pd.read_csv("worldcities.csv")
+            match = df[df["city"].str.lower() == city.strip().lower()]
+
+            if match.empty:
+                messagebox.showerror("Error", f"City '{city}' not found in the database.")
+                return
+
+            lat = float(match.iloc[0]["lat"])
+            lon = float(match.iloc[0]["lng"])
+
+            asyncio.run(main(city, lat, lon))
+        except FileNotFoundError:
+            messagebox.showerror("Error", "worldcities.csv file not found.")
+        except Exception as e:
+            messagebox.showerror("Error", f"Unexcpected error: {str(e)}")
 
 def SearchWindow():
     main = tk.Tk()
