@@ -7,6 +7,8 @@ import folium
 import branca
 import webbrowser
 import asyncio
+import tkinter as tk
+from tkinter import messagebox
 import os
 
 async def getweather():
@@ -93,3 +95,49 @@ def createMap(lat, long, weatherInfo):
 weatherInfo = asyncio.run(getweather())
 m = folium.Map(location=(45.5236, -122.6750))
 createMap(40.7128, -74.0060, weatherInfo)
+def search_button_pressed(city):
+    if city.strip() == "":
+        messagebox.showerror("Error", "Please enter a city name.")
+    else:
+        try:
+            df = pd.read_csv("worldcities.csv")
+            match = df[df["city"].str.lower() == city.strip().lower()]
+
+            if match.empty:
+                messagebox.showerror("Error", f"City '{city}' not found in the database.")
+                return
+
+            lat = float(match.iloc[0]["lat"])
+            lon = float(match.iloc[0]["lng"])
+
+            asyncio.run(main(city, lat, lon))
+        except FileNotFoundError:
+            messagebox.showerror("Error", "worldcities.csv file not found.")
+        except Exception as e:
+            messagebox.showerror("Error", f"Unexcpected error: {str(e)}")
+
+def SearchWindow():
+    main = tk.Tk()
+    main.config(bg="#E4E2E2")
+    main.title("Main Window")
+    main.geometry("708x584")
+
+    entry = tk.Entry(master=main)
+    entry.config(bg="#fff", fg="#000")
+    entry.place(x=178, y=259, width=359, height=53)
+
+    search_button = tk.Button(master=main, text="Display Weather", command= lambda: search_button_pressed(entry.get()))
+    search_button.config(bg="#E4E2E2", fg="#000", )
+    search_button.place(x=256, y=388, width=175, height=35)
+
+    close_button = tk.Button(master=main, text="Close", command=main.destroy)
+    close_button.config(bg="#E4E2E2", fg="#000", )
+    close_button.place(x=256, y=470, width=175, height=35)
+
+    main.mainloop()
+
+# Entry point of the script
+if __name__ == '__main__':
+    SearchWindow()
+
+    #asyncio.run(main('Philadelphia', 39.9526, -75.1652))
