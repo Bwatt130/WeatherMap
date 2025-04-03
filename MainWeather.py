@@ -64,12 +64,26 @@ def generate_map(lat, long, weatherInfo):
           , ["Low: " + str(weatherInfo["lows"][0]),"",""]]
           , columns=["Today", weatherInfo["dates"][1],weatherInfo["dates"][2]]
     )
+    
+    df2 = pd.DataFrame(
+    data=[[str(weatherInfo["today"][0]), str(weatherInfo["today"][1]), str(weatherInfo["today"][2]), str(weatherInfo["today"][3]), str(weatherInfo["today"][4]), str(weatherInfo["today"][5]), str(weatherInfo["today"][6]), str(weatherInfo["today"][7])]
+        ,  [weatherInfo["desc"][0],weatherInfo["desc"][1],weatherInfo["desc"][2],weatherInfo["desc"][3],weatherInfo["desc"][4],weatherInfo["desc"][5],weatherInfo["desc"][6],weatherInfo["desc"][7]]]
+        , columns=["12am", "3am", "6am", "9am", "12pm", "3pm", "6pm", "9pm"]
+    )
 
-    html = df.to_html(
+    forecasthtml = df.to_html(
         classes="table table-striped table-hover table-responsive",
         index=False,
         justify="left"
     )
+
+    hourlyhtml = df2.to_html(
+        classes="table table-striped table-hover table-responsive",
+        index=False,
+        justify="left"
+    )
+
+    html = forecasthtml + "<br>" + hourlyhtml
 
     popup = folium.Popup(html)
 
