@@ -9,7 +9,14 @@ import webbrowser
 import asyncio
 import os
 
-async def getweather() -> None:
+# Make different functions for creating weather object, getting daily forecasts, getting todays hourly forecasts
+# weather object creates weather forecast based on user input
+# daily forecasts returns the highs and lows of the next 3 days as 2d array (and maybe description if possible)
+# hourly forecast returns temp and desc of weather in 3 hour intervals in 2d array
+
+#daily and hourly will call create at the start of each.
+
+async def getweather():
     async with python_weather.Client(unit=python_weather.IMPERIAL) as client:
         weather = await client.get('Philadelphia')
         print(weather.daily_forecasts[0].highest_temperature)
@@ -22,11 +29,13 @@ async def getweather() -> None:
         # gets highs and lows of temp
         highs = []
         lows = []
+        dates = []
         for daily in weather:
             highs.append(daily.highest_temperature)
             lows.append(daily.lowest_temperature)
-        print(highs)
-        print(lows)
+            dates.append(daily.date)
+        print(highs) #WANT TO RETURN
+        print(lows) #WANT TO RETURN
         
         # hourly forecasts every 3 hours
         today = []
@@ -34,10 +43,19 @@ async def getweather() -> None:
         for hourly in daily:
             today.append(hourly.temperature)
             desc.append(hourly.description)
-        print(today)
-        print(desc)
+        print(today) #WANT TO RETURN
+        print(desc) #WANT TO RETURN
+        return{
+            "temp": weather.temperature,
+            "feels": weather.feels_like,
+            "highs": highs,
+            "lows": lows,
+            "today": today,
+            "desc": desc,
+            "dates": dates
+        }
         
-def createMap(lat, long):
+def createMap(lat, long, weatherInfo):
     # Create a map object centered at a specific location
     my_map = folium.Map(location=[lat, long], zoom_start=10)  # Example: New York City
 
@@ -45,11 +63,17 @@ def createMap(lat, long):
     #Get city and send to getweather()
 
     df = pd.DataFrame(
-    data=[["apple", "oranges"], ["other", "stuff"]], columns=["cats", "dogs"]
+    data=[[str(weatherInfo["temp"]) + " Degrees", "High: " + str(weatherInfo["highs"][1]), "High: " + str(weatherInfo["highs"][2])]
+          , ["Feels like " + str(weatherInfo["feels"]) + " Degrees", "Low: " + str(weatherInfo["lows"][1]),  "Low: " +str(weatherInfo["lows"][2])]
+          , ["High: " + str(weatherInfo["highs"][0]), "tomorrow desc", "aftermorrow desc"]
+          , ["Low: " + str(weatherInfo["lows"][0]),"",""]]
+          , columns=["Today", weatherInfo["dates"][1],weatherInfo["dates"][2]]
     )
 
     html = df.to_html(
-        classes="table table-striped table-hover table-condensed table-responsive"
+        classes="table table-striped table-hover table-responsive",
+        index=False,
+        justify="left"
     )
 
     popup = folium.Popup(html)
@@ -66,7 +90,7 @@ def createMap(lat, long):
     #openWindow(map_filepath)
 
     # Open the HTML file in the user's default web browser using a popup window
-    #webbrowser.open(f"file:/{map_filepath}", new=2)
+    webbrowser.open(f"file:/{map_filepath}", new=2)
 
 def openWindow(filepath):
     main = tk.Tk()
@@ -89,6 +113,6 @@ def openWindow(filepath):
 
     main.mainloop()
 
-asyncio.run(getweather())
+weatherInfo = asyncio.run(getweather())
 m = folium.Map(location=(45.5236, -122.6750))
-createMap(40.7128, -74.0060)
+createMap(40.7128, -74.0060, weatherInfo)
