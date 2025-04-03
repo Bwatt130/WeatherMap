@@ -1,19 +1,22 @@
-import tkinter as tk
-from tkinterweb import HtmlFrame
+import webview
 import tempfile
 import python_weather
 import pandas as pd
 import folium
-import branca
-import webbrowser
 import asyncio
+import branca
 import tkinter as tk
-from tkinter import messagebox
 import os
 
-async def getweather():
+# Fetches weather data asynchronously for the given city
+async def fetch_weather(city):
     async with python_weather.Client(unit=python_weather.IMPERIAL) as client:
-        weather = await client.get('Philadelphia')
+        weather = await client.get(city)
+        print(weather.daily_forecasts[0].highest_temperature)
+        print(weather.daily_forecasts[0].lowest_temperature)
+    
+        # returns the current day's forecast temperature (int)
+        print(str(weather.temperature) + " degrees. Feels like " + str(weather.feels_like) + " degrees")
         
         # get the weather forecast for 3 days
         # gets highs and lows of temp
@@ -24,6 +27,8 @@ async def getweather():
             highs.append(daily.highest_temperature)
             lows.append(daily.lowest_temperature)
             dates.append(daily.date)
+        print(highs) #WANT TO RETURN
+        print(lows) #WANT TO RETURN
         
         # hourly forecasts every 3 hours
         today = []
@@ -31,6 +36,8 @@ async def getweather():
         for hourly in daily:
             today.append(hourly.temperature)
             desc.append(hourly.description)
+        print(today) #WANT TO RETURN
+        print(desc) #WANT TO RETURN
         return{
             "temp": weather.temperature,
             "feels": weather.feels_like,
@@ -40,14 +47,16 @@ async def getweather():
             "desc": desc,
             "dates": dates
         }
-        
-def createMap(lat, long, weatherInfo):
-    # Create a map object centered at a specific location
-    my_map = folium.Map(location=[lat, long], zoom_start=10)  # Example: New York City
 
-    #Search .csv file for coords
-    #Get city and send to getweather()
+# Creates the map at given coordinates and puts weather in the popup
+def generate_map(lat, long, weatherInfo):
 
+    my_file = os.path.join(tempfile.gettempdir(), "map.html")  # Path to save the HTML map
+
+    # Create the folium map
+    my_map = folium.Map(location=[lat, long], zoom_start=12)
+    
+    # Create weather description for the popup
     df = pd.DataFrame(
     data=[[str(weatherInfo["temp"]) + " Degrees", "High: " + str(weatherInfo["highs"][1]), "High: " + str(weatherInfo["highs"][2])]
           , ["Feels like " + str(weatherInfo["feels"]) + " Degrees", "Low: " + str(weatherInfo["lows"][1]),  "Low: " +str(weatherInfo["lows"][2])]
@@ -81,40 +90,24 @@ def createMap(lat, long, weatherInfo):
     iframe = branca.element.IFrame(html=html, width=500, height=300)
     popup = folium.Popup(iframe, max_width=500)
 
+
+    # Add marker with weather popup and tooltip
     folium.Marker([lat, long], popup=popup).add_to(my_map)
 
-    # Save the map as an HTML file
-    map_filepath = r"C:\Windows\Temp\map.html"
-    my_map.save(map_filepath)
+    my_map.save(my_file)  # Save map to file
+    return my_file
 
-    #openWindow(map_filepath)
+# Main function to coordinate map creation and display in webview
+async def main(city, lat, lon):
+    weather_info = await fetch_weather(city)  # Get weather data
+    map_file = generate_map(lat, lon, weather_info)  # Generate map with weather in popup
 
-    # Open the HTML file in the user's default web browser using a popup window
-    webbrowser.open(f"file:/{map_filepath}", new=2)
+    # Start the webview GUI with the map file
+    window = webview.create_window("Weather & Map Viewer", map_file, width=800, height=600)
+    webview.start()  # No custom load function needed now
 
-weatherInfo = asyncio.run(getweather())
-m = folium.Map(location=(45.5236, -122.6750))
-createMap(40.7128, -74.0060, weatherInfo)
-def search_button_pressed(city):
-    if city.strip() == "":
-        messagebox.showerror("Error", "Please enter a city name.")
-    else:
-        try:
-            df = pd.read_csv("worldcities.csv")
-            match = df[df["city"].str.lower() == city.strip().lower()]
-
-            if match.empty:
-                messagebox.showerror("Error", f"City '{city}' not found in the database.")
-                return
-
-            lat = float(match.iloc[0]["lat"])
-            lon = float(match.iloc[0]["lng"])
-
-            asyncio.run(main(city, lat, lon))
-        except FileNotFoundError:
-            messagebox.showerror("Error", "worldcities.csv file not found.")
-        except Exception as e:
-            messagebox.showerror("Error", f"Unexcpected error: {str(e)}")
+def button_pressed(city):
+    asyncio.run(main(city, 39.9526, -75.1652))
 
 def SearchWindow():
     main = tk.Tk()
@@ -126,13 +119,9 @@ def SearchWindow():
     entry.config(bg="#fff", fg="#000")
     entry.place(x=178, y=259, width=359, height=53)
 
-    search_button = tk.Button(master=main, text="Display Weather", command= lambda: search_button_pressed(entry.get()))
-    search_button.config(bg="#E4E2E2", fg="#000", )
-    search_button.place(x=256, y=388, width=175, height=35)
-
-    close_button = tk.Button(master=main, text="Close", command=main.destroy)
-    close_button.config(bg="#E4E2E2", fg="#000", )
-    close_button.place(x=256, y=470, width=175, height=35)
+    button = tk.Button(master=main, text="Display Weather", command= lambda: button_pressed(entry.get()))
+    button.config(bg="#E4E2E2", fg="#000", )
+    button.place(x=256, y=388, width=175, height=35)
 
     main.mainloop()
 
