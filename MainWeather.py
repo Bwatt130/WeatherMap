@@ -9,13 +9,6 @@ import webbrowser
 import asyncio
 import os
 
-# Make different functions for creating weather object, getting daily forecasts, getting todays hourly forecasts
-# weather object creates weather forecast based on user input
-# daily forecasts returns the highs and lows of the next 3 days as 2d array (and maybe description if possible)
-# hourly forecast returns temp and desc of weather in 3 hour intervals in 2d array
-
-#daily and hourly will call create at the start of each.
-
 async def getweather():
     async with python_weather.Client(unit=python_weather.IMPERIAL) as client:
         weather = await client.get('Philadelphia')
@@ -69,12 +62,28 @@ def createMap(lat, long, weatherInfo):
           , ["Low: " + str(weatherInfo["lows"][0]),"",""]]
           , columns=["Today", weatherInfo["dates"][1],weatherInfo["dates"][2]]
     )
+    
+    df2 = pd.DataFrame(
+    data=[[str(weatherInfo["today"][0]), str(weatherInfo["today"][1]), str(weatherInfo["today"][2]), str(weatherInfo["today"][3]), str(weatherInfo["today"][4]), str(weatherInfo["today"][5]), str(weatherInfo["today"][6]), str(weatherInfo["today"][7])]
+        ,  [weatherInfo["desc"][0],weatherInfo["desc"][1],weatherInfo["desc"][2],weatherInfo["desc"][3],weatherInfo["desc"][4],weatherInfo["desc"][5],weatherInfo["desc"][6],weatherInfo["desc"][7]]]
+        , columns=["12am", "3am", "6am", "9am", "12pm", "3pm", "6pm", "9pm"]
+    )
 
-    html = df.to_html(
+    forecasthtml = df.to_html(
         classes="table table-striped table-hover table-responsive",
         index=False,
         justify="left"
     )
+
+    hourlyhtml = df2.to_html(
+        classes="table table-striped table-hover table-responsive",
+        index=False,
+        justify="left"
+    )
+
+    html = forecasthtml + "<br>" + hourlyhtml
+
+    print(html)
 
     popup = folium.Popup(html)
 
