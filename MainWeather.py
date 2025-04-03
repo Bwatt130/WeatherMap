@@ -6,6 +6,7 @@ import folium
 import asyncio
 import branca
 import tkinter as tk
+from tkinter import messagebox
 import os
 
 # Fetches weather data asynchronously for the given city
@@ -106,8 +107,11 @@ async def main(city, lat, lon):
     window = webview.create_window("Weather & Map Viewer", map_file, width=800, height=600)
     webview.start()  # No custom load function needed now
 
-def button_pressed(city):
-    asyncio.run(main(city, 39.9526, -75.1652))
+def search_button_pressed(city):
+    if city.strip() == "":
+        messagebox.showerror("Error", "Please enter a city name.")
+    else:
+        asyncio.run(main(city, 39.9526, -75.1652))
 
 def SearchWindow():
     main = tk.Tk()
@@ -119,9 +123,13 @@ def SearchWindow():
     entry.config(bg="#fff", fg="#000")
     entry.place(x=178, y=259, width=359, height=53)
 
-    button = tk.Button(master=main, text="Display Weather", command= lambda: button_pressed(entry.get()))
-    button.config(bg="#E4E2E2", fg="#000", )
-    button.place(x=256, y=388, width=175, height=35)
+    search_button = tk.Button(master=main, text="Display Weather", command= lambda: search_button_pressed(entry.get()))
+    search_button.config(bg="#E4E2E2", fg="#000", )
+    search_button.place(x=256, y=388, width=175, height=35)
+
+    close_button = tk.Button(master=main, text="Close", command=main.destroy)
+    close_button.config(bg="#E4E2E2", fg="#000", )
+    close_button.place(x=256, y=470, width=175, height=35)
 
     main.mainloop()
 
