@@ -18,7 +18,7 @@ webview_window = None
 
 #Load cities globally once
 try:
-    cities_df = pd.read_csv("worldcities.csv")
+    cities_df = pd.read_csv("WeatherMap/worldcities.csv")
     all_cities = sorted(cities_df['city'].dropna().unique().tolist())
 except FileNotFoundError:
     all_cities = []
