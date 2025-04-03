@@ -6,8 +6,18 @@ import folium
 import asyncio
 import branca
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 import os
+
+#Load cities globally once
+try:
+    cities_df = pd.read_csv("worldcities.csv")
+    all_cities = sorted(cities_df['city'].dropna().unique().tolist())
+except FileNotFoundError:
+    all_cities = []
+    messagebox.showerror("Error", "worldcities.csv file not found.")
+
+
 
 # Fetches weather data asynchronously for the given city
 async def fetch_weather(city):
@@ -128,17 +138,29 @@ def search_button_pressed(city):
         except Exception as e:
             messagebox.showerror("Error", f"Unexcpected error: {str(e)}")
 
+#Entry filter
+def on_city_typing(event):
+    typed = city_var.get().lower()
+    filtered = [c for c in all_cities if c.lower().startswith(typed)]
+    city_box['values'] = filtered if filtered else all_cities
+
+#Main for search window
 def SearchWindow():
+    global city_var, city_box
+
     main = tk.Tk()
     main.config(bg="#E4E2E2")
     main.title("Main Window")
     main.geometry("708x584")
 
-    entry = tk.Entry(master=main)
-    entry.config(bg="#fff", fg="#000")
-    entry.place(x=178, y=259, width=359, height=53)
+    city_var = tk.StringVar()
 
-    search_button = tk.Button(master=main, text="Display Weather", command= lambda: search_button_pressed(entry.get()))
+    city_box = ttk.Combobox(main, textvariable=city_var)
+    city_box.place(x=178, y=259, width=359, height=53)
+    city_box['values'] = all_cities
+    city_box.bind('<KeyRelease>', on_city_typing)
+
+    search_button = tk.Button(master=main, text="Display Weather", command= lambda: search_button_pressed(city_var.get()))
     search_button.config(bg="#E4E2E2", fg="#000", )
     search_button.place(x=256, y=388, width=175, height=35)
 
@@ -152,4 +174,3 @@ def SearchWindow():
 if __name__ == '__main__':
     SearchWindow()
 
-    #asyncio.run(main('Philadelphia', 39.9526, -75.1652))
