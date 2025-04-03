@@ -2,4 +2,8 @@ tkinterweb
 python-weather
 pandas
 folium
+<<<<<<< HEAD
 branca
+=======
+branca
+>>>>>>> bda91082e528f74a6b0996a0b38919e3a9ce17fb
