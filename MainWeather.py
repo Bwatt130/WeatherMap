@@ -5,6 +5,7 @@ import pandas as pd
 import folium
 import asyncio
 import branca
+import tkinter as tk
 import os
 
 # Fetches weather data asynchronously for the given city
@@ -91,6 +92,27 @@ async def main(city, lat, lon):
     window = webview.create_window("Weather & Map Viewer", map_file, width=800, height=600)
     webview.start()  # No custom load function needed now
 
+def button_pressed(city):
+    asyncio.run(main(city, 39.9526, -75.1652))
+
+def SearchWindow():
+    main = tk.Tk()
+    main.config(bg="#E4E2E2")
+    main.title("Main Window")
+    main.geometry("708x584")
+
+    entry = tk.Entry(master=main)
+    entry.config(bg="#fff", fg="#000")
+    entry.place(x=178, y=259, width=359, height=53)
+
+    button = tk.Button(master=main, text="Display Weather", command= lambda: button_pressed(entry.get()))
+    button.config(bg="#E4E2E2", fg="#000", )
+    button.place(x=256, y=388, width=175, height=35)
+
+    main.mainloop()
+
 # Entry point of the script
 if __name__ == '__main__':
-    asyncio.run(main('Philadelphia', 39.9526, -75.1652))
+    SearchWindow()
+
+    #asyncio.run(main('Philadelphia', 39.9526, -75.1652))
