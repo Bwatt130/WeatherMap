@@ -41,10 +41,12 @@ async def fetch_weather(city):
         highs = []
         lows = []
         dates = []
+        dailyDesc = []
         for daily in weather:
             highs.append(daily.highest_temperature)
             lows.append(daily.lowest_temperature)
             dates.append(daily.date)
+            dailyDesc.append(daily.description)
         print(highs) #WANT TO RETURN
         print(lows) #WANT TO RETURN
         
@@ -56,8 +58,10 @@ async def fetch_weather(city):
             desc.append(hourly.description)
         print(today) #WANT TO RETURN
         print(desc) #WANT TO RETURN
+        print(weather.description)
         return{
             "temp": weather.temperature,
+            "ddesc": dailyDesc,
             "feels": weather.feels_like,
             "highs": highs,
             "lows": lows,
@@ -76,7 +80,7 @@ def add_pin_to_map(lat, lon, weatherInfo, city_name):
     df = pd.DataFrame(
     data=[[str(weatherInfo["temp"]) + " Degrees", "High: " + str(weatherInfo["highs"][1]), "High: " + str(weatherInfo["highs"][2])]
           , ["Feels like " + str(weatherInfo["feels"]) + " Degrees", "Low: " + str(weatherInfo["lows"][1]),  "Low: " +str(weatherInfo["lows"][2])]
-          , ["High: " + str(weatherInfo["highs"][0]), "tomorrow desc", "aftermorrow desc"]
+          , ["High: " + str(weatherInfo["highs"][0]), weatherInfo["ddesc"][1], weatherInfo["ddesc"][2]]
           , ["Low: " + str(weatherInfo["lows"][0]),"",""]]
           , columns=["Today", weatherInfo["dates"][1],weatherInfo["dates"][2]]
     )
@@ -120,7 +124,7 @@ def generate_map(lat, long, weatherInfo):
     df = pd.DataFrame(
     data=[[str(weatherInfo["temp"]) + " Degrees", "High: " + str(weatherInfo["highs"][1]), "High: " + str(weatherInfo["highs"][2])]
           , ["Feels like " + str(weatherInfo["feels"]) + " Degrees", "Low: " + str(weatherInfo["lows"][1]),  "Low: " +str(weatherInfo["lows"][2])]
-          , ["High: " + str(weatherInfo["highs"][0]), "tomorrow desc", "aftermorrow desc"]
+          , ["High: " + str(weatherInfo["highs"][0]), weatherInfo["ddesc"][1], weatherInfo["ddesc"][2]]
           , ["Low: " + str(weatherInfo["lows"][0]),"",""]]
           , columns=["Today", weatherInfo["dates"][1],weatherInfo["dates"][2]]
     )
