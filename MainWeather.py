@@ -23,25 +23,16 @@ except FileNotFoundError:
 async def fetch_weather(city):
     async with python_weather.Client(unit=python_weather.IMPERIAL) as client:
         weather = await client.get(city)
-        print(weather.daily_forecasts[0].highest_temperature)
-        print(weather.daily_forecasts[0].lowest_temperature)
-    
-        # returns the current day's forecast temperature (int)
-        print(str(weather.temperature) + " degrees. Feels like " + str(weather.feels_like) + " degrees")
         
         # get the weather forecast for 3 days
         # gets highs and lows of temp
         highs = []
         lows = []
         dates = []
-        dailyDesc = []
         for daily in weather:
             highs.append(daily.highest_temperature)
             lows.append(daily.lowest_temperature)
             dates.append(daily.date)
-            dailyDesc.append(daily.description)
-        print(highs) #WANT TO RETURN
-        print(lows) #WANT TO RETURN
         
         # hourly forecasts every 3 hours
         today = []
@@ -49,12 +40,9 @@ async def fetch_weather(city):
         for hourly in daily:
             today.append(hourly.temperature)
             desc.append(hourly.description)
-        print(today) #WANT TO RETURN
-        print(desc) #WANT TO RETURN
-        print(weather.description)
+
         return{
             "temp": weather.temperature,
-            "ddesc": dailyDesc,
             "feels": weather.feels_like,
             "highs": highs,
             "lows": lows,
@@ -73,7 +61,7 @@ def add_pin_to_map(lat, lon, weatherInfo, city_name):
     df = pd.DataFrame(
     data=[[str(weatherInfo["temp"]) + " Degrees", "High: " + str(weatherInfo["highs"][1]), "High: " + str(weatherInfo["highs"][2])]
           , ["Feels like " + str(weatherInfo["feels"]) + " Degrees", "Low: " + str(weatherInfo["lows"][1]),  "Low: " +str(weatherInfo["lows"][2])]
-          , ["High: " + str(weatherInfo["highs"][0]), weatherInfo["ddesc"][1], weatherInfo["ddesc"][2]]
+          , ["High: " + str(weatherInfo["highs"][0]), "", ""]
           , ["Low: " + str(weatherInfo["lows"][0]),"",""]]
           , columns=["Today", weatherInfo["dates"][1],weatherInfo["dates"][2]]
     )
@@ -117,7 +105,7 @@ def generate_map(lat, long, weatherInfo):
     df = pd.DataFrame(
     data=[[str(weatherInfo["temp"]) + " Degrees", "High: " + str(weatherInfo["highs"][1]), "High: " + str(weatherInfo["highs"][2])]
           , ["Feels like " + str(weatherInfo["feels"]) + " Degrees", "Low: " + str(weatherInfo["lows"][1]),  "Low: " +str(weatherInfo["lows"][2])]
-          , ["High: " + str(weatherInfo["highs"][0]), weatherInfo["ddesc"][1], weatherInfo["ddesc"][2]]
+          , ["High: " + str(weatherInfo["highs"][0]), "", ""]
           , ["Low: " + str(weatherInfo["lows"][0]),"",""]]
           , columns=["Today", weatherInfo["dates"][1],weatherInfo["dates"][2]]
     )
