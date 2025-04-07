@@ -8,12 +8,6 @@ import branca
 import tkinter as tk
 from tkinter import messagebox, ttk
 import os
-import threading
-
-#Global Variables
-map_obj = None
-map_file_path = os.path.join(tempfile.gettempdir(), "map.html")
-webview_window = None
 
 
 #Load cities globally once
@@ -23,7 +17,6 @@ try:
 except FileNotFoundError:
     all_cities = []
     messagebox.showerror("Error", "worldcities.csv file not found.")
-
 
 
 # Fetches weather data asynchronously for the given city
@@ -161,21 +154,15 @@ def generate_map(lat, long, weatherInfo):
     my_map.save(my_file)  # Save map to file
     return my_file
 
-# Start the map in a webview window
-def start_webview():
-    global webview_window
-    webview.start(gui='tkinter')
-    # Once closed, reset map
-    reset_map_state()
-    
-#Reset map
-def reset_map_state():
-    global map_obj, webview_window
-    map_obj = None
-    webview_window = None
+# Main function to coordinate map creation and display in webview
+async def main(city, lat, lon):
+    weather_info = await fetch_weather(city)  # Get weather data
+    map_file = generate_map(lat, lon, weather_info)  # Generate map with weather in popup
 
+    # Start the webview GUI with the map file
+    window = webview.create_window("Weather & Map Viewer", map_file, width=800, height=600)
+    webview.start()  # No custom load function needed now
 
-# Function to handle the search button press
 def search_button_pressed(city):
     if city.strip() == "":
         messagebox.showerror("Error", "Please enter a city name.")
@@ -229,21 +216,7 @@ def SearchWindow():
 
     main.mainloop()
 
-# Main function to coordinate map creation and display in webview
-async def main(city, lat, lon):
-    global map_obj, webview_window
-
-    weather_info = await fetch_weather(city)
-    add_pin_to_map(lat, lon, weather_info, city)
-    map_obj.save(map_file_path)
-
-    if webview_window is not None:
-        webview_window.load_url(map_file_path)
-
 # Entry point of the script
 if __name__ == '__main__':
-    threading.Thread(target=SearchWindow, daemon=True).start()
-    webview_window = webview.create_window("Weather & Map Viewer", map_file_path, width=800, height=600)
-    webview.start()  # Now runs on the main thread
-
+    SearchWindow()
 
