@@ -8,7 +8,8 @@ import branca
 import tkinter as tk
 from tkinter import messagebox, ttk
 import os
-
+from PIL import Image, ImageTk
+import base64
 
 #Load cities globally once
 try:
@@ -60,6 +61,9 @@ async def fetch_weather(city):
             "dates": dates
         }
 
+
+
+
 # Creates the map at given coordinates and puts weather in the popup
 def generate_map(lat, long, weatherInfo):
 
@@ -95,13 +99,17 @@ def generate_map(lat, long, weatherInfo):
         justify="left"
     )
 
-    html = forecasthtml + "<br>" + hourlyhtml
-
-    popup = folium.Popup(html)
+    # Add an image to the popup
+    image_path = "cloud.jpg"  # Path to the image
+    if os.path.exists(image_path):
+        with open(image_path, "rb") as img_file:
+            encoded_image = f'<img src="data:image/jpeg;base64,{base64.b64encode(img_file.read()).decode()}" alt="Weather Image" style="width:10%;height:auto;">'
+        html = f'<div>{encoded_image}</div>' + forecasthtml + "<br>" + hourlyhtml
+    else:
+        html = forecasthtml + "<br>" + hourlyhtml
 
     iframe = branca.element.IFrame(html=html, width=500, height=300)
     popup = folium.Popup(iframe, max_width=500)
-
 
     # Add marker with weather popup and tooltip
     folium.Marker([lat, long], popup=popup).add_to(my_map)
@@ -153,6 +161,9 @@ def SearchWindow():
     main.config(bg="#E4E2E2")
     main.title("Main Window")
     main.geometry("708x584")
+
+    image = Image.open(r'cloud.jpg')
+    display = ImageTk.PhotoImage(image)
 
     city_var = tk.StringVar()
 
