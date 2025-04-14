@@ -12,7 +12,7 @@ import os
 
 #Load cities globally once
 try:
-    cities_df = pd.read_csv("WeatherMap/worldcities.csv")
+    cities_df = pd.read_csv("worldcities.csv")
     all_cities = sorted(cities_df['city'].dropna().unique().tolist())
 except FileNotFoundError:
     all_cities = []
@@ -156,7 +156,7 @@ def search_button_pressed(city):
         messagebox.showerror("Error", "Please enter a city name.")
     else:
         try:
-            df = pd.read_csv("WeatherMap/worldcities.csv")
+            df = pd.read_csv("worldcities.csv")
             match = df[df["city"].str.lower() == city.strip().lower()]
 
             if match.empty:
