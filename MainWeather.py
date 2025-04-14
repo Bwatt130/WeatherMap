@@ -19,6 +19,7 @@ except FileNotFoundError:
     messagebox.showerror("Error", "worldcities.csv file not found.")
 
 
+
 # Fetches weather data asynchronously for the given city
 async def fetch_weather(city):
     async with python_weather.Client(unit=python_weather.IMPERIAL) as client:
@@ -96,10 +97,15 @@ def add_pin_to_map(lat, lon, weatherInfo, city_name):
 # Creates the map at given coordinates and puts weather in the popup
 def generate_map(lat, long, weatherInfo):
 
-    my_file = os.path.join(tempfile.gettempdir(), "map.html")  # Path to save the HTML map
+
+
+    #my_file = os.path.join(tempfile.gettempdir(), "map.html")  # Path to save the HTML map
 
     # Create the folium map
     my_map = folium.Map(location=[lat, long], zoom_start=12)
+    
+    my_file = "map.html"
+    my_map.save(my_file)
     
     # Create weather description for the popup
     df = pd.DataFrame(
