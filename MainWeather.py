@@ -10,13 +10,15 @@ from tkinter import messagebox, ttk
 import os
 
 
+
 #Load cities globally once
 try:
-    cities_df = pd.read_csv("WeatherMap/worldcities.csv")
+    cities_df = pd.read_csv("worldcities.csv")
     all_cities = sorted(cities_df['city'].dropna().unique().tolist())
 except FileNotFoundError:
     all_cities = []
     messagebox.showerror("Error", "worldcities.csv file not found.")
+
 
 
 # Fetches weather data asynchronously for the given city
@@ -101,6 +103,9 @@ def generate_map(lat, long, weatherInfo):
     # Create the folium map
     my_map = folium.Map(location=[lat, long], zoom_start=12)
     
+    #my_file = r"C:\TEMP\map.html"
+    my_map.save(my_file)
+
     # Create weather description for the popup
     df = pd.DataFrame(
     data=[[str(weatherInfo["temp"]) + " Degrees", "High: " + str(weatherInfo["highs"][1]), "High: " + str(weatherInfo["highs"][2])]
@@ -147,8 +152,10 @@ async def main(city, lat, lon):
     weather_info = await fetch_weather(city)  # Get weather data
     map_file = generate_map(lat, lon, weather_info)  # Generate map with weather in popup
 
+    map_path = tempfile.gettempdir() + r"\map.html"  # Path to the saved map file
+
     # Start the webview GUI with the map file
-    window = webview.create_window("Weather & Map Viewer", map_file, width=800, height=600)
+    window = webview.create_window("Weather & Map Viewer", map_path, width=800, height=600)
     webview.start()  # No custom load function needed now
 
 def search_button_pressed(city):
@@ -156,7 +163,7 @@ def search_button_pressed(city):
         messagebox.showerror("Error", "Please enter a city name.")
     else:
         try:
-            df = pd.read_csv("WeatherMap/worldcities.csv")
+            df = pd.read_csv("worldcities.csv")
             match = df[df["city"].str.lower() == city.strip().lower()]
 
             if match.empty:
@@ -197,6 +204,8 @@ def SearchWindow():
     search_button = tk.Button(master=main, text="Display Weather", command= lambda: search_button_pressed(city_var.get()))
     search_button.config(bg="#E4E2E2", fg="#000", )
     search_button.place(x=256, y=388, width=175, height=35)
+    
+    main.bind("<Return>", lambda event: search_button_pressed(city_var.get()))
 
     close_button = tk.Button(master=main, text="Close", command=main.destroy)
     close_button.config(bg="#E4E2E2", fg="#000", )
@@ -207,4 +216,3 @@ def SearchWindow():
 # Entry point of the script
 if __name__ == '__main__':
     SearchWindow()
-
