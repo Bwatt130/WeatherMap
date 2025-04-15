@@ -10,6 +10,7 @@ from tkinter import messagebox, ttk
 import os
 
 
+
 #Load cities globally once
 try:
     cities_df = pd.read_csv("worldcities.csv")
@@ -97,16 +98,14 @@ def add_pin_to_map(lat, lon, weatherInfo, city_name):
 # Creates the map at given coordinates and puts weather in the popup
 def generate_map(lat, long, weatherInfo):
 
-
-
-    #my_file = os.path.join(tempfile.gettempdir(), "map.html")  # Path to save the HTML map
+    my_file = os.path.join(tempfile.gettempdir(), "map.html")  # Path to save the HTML map
 
     # Create the folium map
     my_map = folium.Map(location=[lat, long], zoom_start=12)
     
-    my_file = "map.html"
+    #my_file = r"C:\TEMP\map.html"
     my_map.save(my_file)
-    
+
     # Create weather description for the popup
     df = pd.DataFrame(
     data=[[str(weatherInfo["temp"]) + " Degrees", "High: " + str(weatherInfo["highs"][1]), "High: " + str(weatherInfo["highs"][2])]
@@ -153,8 +152,10 @@ async def main(city, lat, lon):
     weather_info = await fetch_weather(city)  # Get weather data
     map_file = generate_map(lat, lon, weather_info)  # Generate map with weather in popup
 
+    map_path = r"C:\Users\lilwa\AppData\Local\Temp" + os.path.sep + "map.html"  # Path to the saved map file
+
     # Start the webview GUI with the map file
-    window = webview.create_window("Weather & Map Viewer", map_file, width=800, height=600)
+    window = webview.create_window("Weather & Map Viewer", map_path, width=800, height=600)
     webview.start()  # No custom load function needed now
 
 def search_button_pressed(city):
@@ -203,6 +204,8 @@ def SearchWindow():
     search_button = tk.Button(master=main, text="Display Weather", command= lambda: search_button_pressed(city_var.get()))
     search_button.config(bg="#E4E2E2", fg="#000", )
     search_button.place(x=256, y=388, width=175, height=35)
+    
+    main.bind("<Return>", lambda event: search_button_pressed(city_var.get()))
 
     close_button = tk.Button(master=main, text="Close", command=main.destroy)
     close_button.config(bg="#E4E2E2", fg="#000", )
@@ -212,5 +215,5 @@ def SearchWindow():
 
 # Entry point of the script
 if __name__ == '__main__':
+    print(tempfile.gettempdir())
     SearchWindow()
-
