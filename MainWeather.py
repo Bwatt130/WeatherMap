@@ -152,7 +152,7 @@ async def main(city, lat, lon):
     weather_info = await fetch_weather(city)  # Get weather data
     map_file = generate_map(lat, lon, weather_info)  # Generate map with weather in popup
 
-    map_path = r"C:\Users\lilwa\AppData\Local\Temp" + os.path.sep + "map.html"  # Path to the saved map file
+    map_path = tempfile.gettempdir() + r"\map.html"  # Path to the saved map file
 
     # Start the webview GUI with the map file
     window = webview.create_window("Weather & Map Viewer", map_path, width=800, height=600)
@@ -215,5 +215,4 @@ def SearchWindow():
 
 # Entry point of the script
 if __name__ == '__main__':
-    print(tempfile.gettempdir())
     SearchWindow()
