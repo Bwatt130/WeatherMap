@@ -9,8 +9,6 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 import os
 
-
-
 #Load cities globally once
 try:
     cities_df = pd.read_csv("worldcities.csv")
@@ -18,7 +16,6 @@ try:
 except FileNotFoundError:
     all_cities = []
     messagebox.showerror("Error", "worldcities.csv file not found.")
-
 
 
 # Fetches weather data asynchronously for the given city
