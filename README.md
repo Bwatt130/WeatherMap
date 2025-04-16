@@ -2,6 +2,10 @@
 This is a final project that makes a weather forecast map for the CNSA-266 AM class.
 Created by Alex Mansfield and Brandon Watson
 
+To run the program:
+
+    download and extract the MainWeather.zip file and run MainWeather.exe
+
 The following list is a list of all the imported libraries that we used to make this project possible:
 
     webview
